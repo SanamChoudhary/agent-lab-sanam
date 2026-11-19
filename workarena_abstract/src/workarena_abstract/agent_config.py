@@ -13,6 +13,8 @@ from agentlab.agents.generic_agent.agent_configs import AGENT_4o_MINI, FLAGS_GPT
 from agentlab.agents.generic_agent.generic_agent import GenericAgentArgs
 from agentlab.llm.llm_configs import CHAT_MODEL_ARGS_DICT
 
+from .intervention_agent import InterventionAgentArgs
+
 FLAGS_DIAGNOSTIC = FLAGS_GPT_4o.copy()  # deep copy
 
 # Reasoning made visible
@@ -37,7 +39,16 @@ AGENT_4o_MINI_DIAGNOSTIC = GenericAgentArgs(
 # distinct (and short: Windows 260-char path limit) name, not confused with the standard config
 AGENT_4o_MINI_DIAGNOSTIC.agent_name = "GenericAgent-4omini-diag"
 
+# Same model and flags as the diagnostic agent, plus the interventions in intervention_agent.py.
+# Run it with the task's simulated user switched on (run_baseline.py does this).
+AGENT_4o_MINI_INTERVENTION = InterventionAgentArgs(
+    chat_model_args=CHAT_MODEL_ARGS_DICT["openai/gpt-4o-mini-2024-07-18"],
+    flags=FLAGS_DIAGNOSTIC.copy(),
+)
+AGENT_4o_MINI_INTERVENTION.agent_name = "GenericAgent-4omini-intv"
+
 AGENTS = {
     "diagnostic": AGENT_4o_MINI_DIAGNOSTIC,
     "standard": AGENT_4o_MINI,
+    "intervention": AGENT_4o_MINI_INTERVENTION,
 }

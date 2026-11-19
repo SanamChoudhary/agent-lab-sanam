@@ -1,4 +1,4 @@
-# Experiment results
+# Experiment results (initial benchmark results without implementation)
 
 `workarena_abstract/scripts/run_baseline.py` saves every agent run here. Each run is called a study and gets its own folder.
 

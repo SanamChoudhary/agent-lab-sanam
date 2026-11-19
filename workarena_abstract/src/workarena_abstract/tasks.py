@@ -31,11 +31,16 @@ class AbstractedTaskMixin:
 
     original_task_cls = None  # set on each generated class
 
-    def __init__(self, *args, reward_mode: str = "abstracted", **kwargs):
+    def __init__(
+        self, *args, reward_mode: str = "abstracted", simulated_user: bool = False, **kwargs
+    ):
         if reward_mode not in REWARD_MODES:
             raise ValueError(f"reward_mode must be one of {REWARD_MODES}, got {reward_mode!r}")
         super().__init__(*args, **kwargs)
         self.reward_mode = reward_mode
+        # when True, questions the agent sends in the chat are answered from the original goal
+        self.simulated_user = simulated_user
+        self._n_chat_answered = 0
 
     @classmethod
     def get_task_id(cls):
@@ -175,7 +180,43 @@ class AbstractedTaskMixin:
         }
         if error:
             info["abstracted_error"] = error
+
+        # the agent asked a question in the chat: the simulated user answers it
+        question = chat_messages[-1] if chat_messages else None
+        if (
+            self.simulated_user
+            and not done
+            and not user_message
+            and len(chat_messages) > self._n_chat_answered
+            and question["role"] == "assistant"
+            and question["message"].strip().endswith("?")
+        ):
+            self._n_chat_answered = len(chat_messages) + 1  # the reply is appended after this
+            user_message = simulated_user_reply(self.original_goal, question["message"])
+            info["sim_user_question"] = question["message"]
+            info["sim_user_reply"] = user_message
         return reward, done, user_message, info
+
+
+SIMULATED_USER_MODEL = "gpt-4o-mini-2024-07-18"
+
+
+def simulated_user_reply(original_goal: str, question: str) -> str:
+    """Answer the agent's question as the requester, who knows only the original (full) goal."""
+    from openai import OpenAI
+
+    prompt = (
+        "You asked a coworker to do a task in a web application. Your full request, with every "
+        f"detail you know, was:\n\n{original_goal}\n\nThey asked you: {question}\n\n"
+        "Answer in one short sentence, using only the details in your request. If your request "
+        "does not contain the answer, say you don't know and that they should use their judgment."
+    )
+    response = OpenAI().chat.completions.create(
+        model=SIMULATED_USER_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+    )
+    return response.choices[0].message.content.strip()
 
 
 def _make_abstract_class(original_cls):

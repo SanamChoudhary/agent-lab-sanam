@@ -3,9 +3,11 @@
 !.gitignore
 !README.md
 !error_analysis.md
+!intervention_results.md
 
 # Studies pushed to GitHub
 !/2026-11-19_02-44_abstracted_diagnostic/
+!/2026-11-19_06-44_abstracted_intervention/
 
 # Superseded attempts that AgentLab moved aside when relaunching an episode ("_" prefix)
 /*/_*/

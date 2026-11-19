@@ -147,7 +147,8 @@ def export_episode(res, out_root: Path) -> dict:
                 "truncated": s.truncated,
                 "validation": {
                     k: v for k, v in (s.task_info or {}).items()
-                    if k in ("strict_success", "abstracted_success", "strict_message", "abstracted_message", "message")
+                    if k in ("strict_success", "abstracted_success", "strict_message", "abstracted_message", "message",
+                             "sim_user_question", "sim_user_reply")
                 },
                 "n_retry": stats.get("n_retry"),
                 "prompt_tokens": stats.get("input_tokens") or stats.get("n_token_prompt"),

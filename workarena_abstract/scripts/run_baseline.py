@@ -114,6 +114,10 @@ def main():
         benchmark = make_benchmark(variant, n_repeats=args.n_repeats)
         if args.task_glob:
             benchmark = benchmark.subset_from_glob("task_name", args.task_glob)
+        if args.agent == "intervention" and variant == "abstracted":
+            # the agent may ask questions; the task's simulated user answers from the original goal
+            for env_args in benchmark.env_args_list:
+                env_args.task_kwargs = {**(env_args.task_kwargs or {}), "simulated_user": True}
         study = Study([agent], benchmark, logging_level_stdout=logging.WARNING)
         # Short study folder name: AgentLab's default (agent + benchmark + filter) plus the
         # per-episode folders exceeds Windows' 260-character path limit under OneDrive.

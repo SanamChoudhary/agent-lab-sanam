@@ -1,0 +1,2 @@
+agent.agent_name,env.benchmark,avg_reward,std_err,avg_steps,n_completed,n_err,cum_cost
+GenericAgent-4omini-intv,workarena_abstract,0.364,0.084,11.061,33/33,1,0.5319
