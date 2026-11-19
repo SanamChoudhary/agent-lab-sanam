@@ -218,16 +218,7 @@ These are the parts of the context the model receives that most often led to err
 
 ---
 
-## 5. Caveats
-
-- **One episode per task.** Patterns are indicative, not statistically established.
-- **No comparison with the original prompts yet.** Whether the original prompts produce the same failures, especially in filter, sort, catalog and dashboard tasks, can only be answered by running the same 33 episodes with the original prompts. This report only shows where the vague prompt *visibly* played a role (E4, E5).
-- **Hand-labelled categories.** Error types were assigned by reading the logs. Some episodes fit several types, and the counts are approximate.
-- **Sort validation detail.** For sort tasks with 2–3 fields, the validation message shows `[]` even when one column header was clicked, because a header-click sort is only detected for single-field tasks. This does not change any outcome, since no episode sorted a second field. WorkArena's original check behaves the same way.
-
----
-
-## 6. Possible interventions (for the next stage)
+## 5. Possible interventions (for the next stage)
 
 Each one targets one of the errors above.
 
