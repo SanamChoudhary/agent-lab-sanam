@@ -1,4 +1,10 @@
-# Raw study outputs can be large; keep them out of git by default (only this README is tracked).
-*
+# Raw study outputs can be large: studies are kept out of git unless listed below.
+/*
 !.gitignore
 !README.md
+
+# Studies pushed to GitHub
+!/2026-11-19_02-44_abstracted_diagnostic/
+
+# Superseded attempts that AgentLab moved aside when relaunching an episode ("_" prefix)
+/*/_*/
