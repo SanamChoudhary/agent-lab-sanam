@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "workarena-abstract"
+version = "0.1.0"
+description = "WorkArena L1 tasks with abstracted (underspecified) prompts and relaxed success criteria."
+requires-python = ">=3.10"
+dependencies = [
+    "browsergym-workarena>=0.5.3",
+    "browsergym-experiments",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
