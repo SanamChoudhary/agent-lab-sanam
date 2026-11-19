@@ -19,7 +19,6 @@ Study folder: [`2026-11-19_02-44_abstracted_diagnostic/`](2026-11-19_02-44_abstr
 | Max steps | 15 per episode |
 | Success measure | Abstracted success: the agent did what the abstracted prompt asked (see `workarena_abstract/README.md`) |
 | Run | 2026-11-19, 02:44–03:27 (43 min), 8 episodes in parallel |
-| Total | 403 agent steps, $0.56 OpenAI cost |
 
 ### Overall
 
@@ -87,13 +86,6 @@ Study folder: [`2026-11-19_02-44_abstracted_diagnostic/`](2026-11-19_02-44_abstr
 - **Example failure, create-incident (seed 71).**
   - **What the agent did:** it filled in the description but never set the mandatory *Caller* field to "System Administrator". The submission was rejected, and the agent then waited (`noop`) for the remaining steps without noticing the error.
   - **Where to look:** `trajectories/workarena_abstract.create-incident__seed71/trajectory.md`.
-
-### Caveats
-
-- **One seed per task.** Per-task and per-category rates are indicative only.
-- **Abstracted prompts only.** Whether a failure is caused by the abstraction or by the task's difficulty for this agent needs the same run on the original prompts.
-- **Retries.** The create-incident episode was automatically relaunched twice: the first attempt lost its connection to the ServiceNow instance, and the second stopped partway. The reported result is the third attempt. The superseded attempts (folders starting with `_`) are not included in the repository.
-
 ## Folder layout
 
 ```
