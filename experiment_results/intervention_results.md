@@ -33,7 +33,7 @@
 
 ## 2. What the interventions were
 
-All of them are general: they use only the goal, the page content, the URL, the action history and the chat. None of them mentions ServiceNow or a specific task. The code is in `workarena_abstract/src/workarena_abstract/intervention_agent.py` and `tasks.py`.
+The code is in `workarena_abstract/src/workarena_abstract/intervention_agent.py` and `tasks.py`.
 
 | # | Intervention | Simple explanation |
 |---|---|---|
@@ -159,6 +159,4 @@ Two of these look like chance with a single attempt (order-ipad-pro and all-menu
 1. **General interventions help with "getting stuck" and "getting lost".** They raised success from 8 to 12, mostly through less looping and better awareness of which page the agent is on.
 2. **They don't teach the agent how a particular screen works.** Filters, multi-field sorts and charts need knowledge of the interface, which general hints can't provide. The next intervention to try is a general way to *learn* those skills, e.g. memory built from the agent's own successful attempts (the "experience memory" left out of this round).
 3. **The agent guesses instead of asking.** Information only the user knows was invented, never asked for. This is central to our research question. The ask-the-user option needs a stronger trigger before we can measure its effect.
-4. **Next runs needed:**
-   - The same 33 tasks with the **original prompts** (diagnostic agent), to measure the baseline gap.
-   - More than one seed per task, so the differences can be trusted.
+
