@@ -1,0 +1,4 @@
+# Raw study outputs can be large; keep them out of git by default (only this README is tracked).
+*
+!.gitignore
+!README.md

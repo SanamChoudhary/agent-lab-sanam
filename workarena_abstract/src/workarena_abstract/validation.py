@@ -46,13 +46,13 @@ def validate_form(task, page, chat_messages):
     if sys_id is None:
         return _fail("The form has not been submitted.")
 
+    # No waiting here: WorkArena's strict validator (always run just before this) already waited
+    # up to ~10 s for the record to appear. Waiting again doubled the time of every step after a
+    # rejected form submission (~45 s each).
     record = table_api_call(
         instance=task.instance,
         table=task.table_name,
         params={"sysparm_query": f"sys_id={sys_id}", "sysparm_display_value": True},
-        wait_for_record=True,
-        max_retries=20,
-        raise_on_wait_expired=False,
     )["result"]
     if len(record) == 0:
         return _fail("The record was not found in the database.")

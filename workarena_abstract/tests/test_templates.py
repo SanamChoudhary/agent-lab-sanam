@@ -200,3 +200,55 @@ def test_env_args_register_tasks_in_fresh_process(tmp_path):
         "assert f'browsergym/{ea.task_name}' in gym.registry, ea.task_name\n"
     )
     subprocess.run([sys.executable, "-c", code], check=True)
+
+
+def test_trajectory_export_offline(tmp_path):
+    """Exporter turns AgentLab step records into readable trajectory and context files."""
+    import json
+    from types import SimpleNamespace
+
+    from agentlab.experiments.loop import StepInfo
+    from agentlab.llm.llm_utils import AIMessage, Discussion, HumanMessage, SystemMessage
+
+    from workarena_abstract.trajectories import export_episode
+
+    reply = (
+        "<think>The user wants an iPad mini; no colour given, I'll keep the default.</think>\n"
+        "<plan>1. open catalog 2. pick iPad mini 3. order</plan><step>1</step>\n"
+        "<memory>colour unspecified, using default</memory>\n<action>click('a12')</action>"
+    )
+    chat = Discussion([SystemMessage("You are an agent..."), HumanMessage("# Goal\nPlease order 1 iPad mini for me.\n# AXTree ..."), AIMessage(reply)])
+    setup_info = {
+        "category": "service catalog",
+        "original_task": "workarena.servicenow.order-ipad-mini",
+        "original_goal": 'Go to the hardware store and order 1 "iPad mini" with configuration {...}',
+        "abstracted_goal": "Please order 1 iPad mini for me.",
+        "removed_info": [{"info": 'Choose the colour = "Space Grey"', "recoverable": False}],
+    }
+    steps = [
+        StepInfo(step=0, obs={"url": "https://x/catalog", "last_action_error": ""}, action="click('a12')",
+                 agent_info={"think": "The user wants an iPad mini", "chat_messages": chat, "stats": {"n_retry": 0}},
+                 task_info=setup_info),
+        StepInfo(step=1, obs={"url": "https://x/checkout", "last_action_error": "TimeoutError: x"}, reward=1,
+                 terminated=True, task_info={"strict_success": 0.0, "abstracted_success": 1.0}),
+    ]
+    res = SimpleNamespace(
+        exp_args=SimpleNamespace(
+            env_args=SimpleNamespace(task_name="workarena_abstract.order-ipad-mini", task_seed=7),
+            agent_args=SimpleNamespace(agent_name="GenericAgent-test"),
+        ),
+        steps_info=steps,
+        summary_info={"n_steps": 1, "cum_reward": 1, "err_msg": None},
+        exp_dir=tmp_path / "raw",
+    )
+    row = export_episode(res, tmp_path / "trajectories")
+    ep = tmp_path / "trajectories" / "workarena_abstract.order-ipad-mini__seed7"
+    assert row["strict_success"] == 0.0 and row["abstracted_success"] == 1.0
+    traj = (ep / "trajectory.md").read_text(encoding="utf-8")
+    assert "colour unspecified, using default" in traj and "click('a12')" in traj and "TimeoutError" in traj
+    prompt = (ep / "context" / "step_00_prompt.md").read_text(encoding="utf-8")
+    assert "Please order 1 iPad mini" in prompt and "You are an agent" in prompt
+    assert "<memory>" in (ep / "context" / "step_00_response.md").read_text(encoding="utf-8")
+    data = json.loads((ep / "trajectory.json").read_text(encoding="utf-8"))
+    assert data["steps"][0]["plan"].startswith("1. open catalog")
+    assert "unrecoverable" in (ep / "summary.md").read_text(encoding="utf-8")

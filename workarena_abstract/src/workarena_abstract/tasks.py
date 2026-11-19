@@ -56,18 +56,17 @@ class AbstractedTaskMixin:
         abstraction = self._abstract()
         self.abstracted_goal = abstraction.goal
         self.removed_info = abstraction.removed_as_dicts()
+        self.setup_info = {
+            "original_task": self.original_task_cls.get_task_id(),
+            "category": self.category(),
+            "abstraction_level": T.ABSTRACTION_LEVEL,
+            "original_goal": original_goal,
+            "abstracted_goal": abstraction.goal,
+            "removed_info": self.removed_info,
+            "reward_mode": self.reward_mode,
+        }
         info = dict(info or {})
-        info.update(
-            {
-                "original_task": self.original_task_cls.get_task_id(),
-                "category": self.category(),
-                "abstraction_level": T.ABSTRACTION_LEVEL,
-                "original_goal": original_goal,
-                "abstracted_goal": abstraction.goal,
-                "removed_info": self.removed_info,
-                "reward_mode": self.reward_mode,
-            }
-        )
+        info.update(self.setup_info)
         return abstraction.goal, info
 
     def _abstract(self) -> T.Abstraction:
@@ -162,6 +161,9 @@ class AbstractedTaskMixin:
         chosen = abstracted if self.reward_mode == "abstracted" else strict
         reward, done, user_message, _ = chosen
         info = {
+            # AgentLab does not save the info returned at reset, only the per-step task_info, so
+            # the goals / removed info are repeated here to keep them in the saved results.
+            **getattr(self, "setup_info", {}),
             "message": chosen[3].get("message", ""),
             "reward_mode": self.reward_mode,
             "strict_success": float(strict[0]),
